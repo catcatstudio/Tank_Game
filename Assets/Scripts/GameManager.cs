@@ -7,6 +7,8 @@ using UnityEngine.SceneManagement;
 public class GameManager : MonoBehaviourPunCallbacks
 {
     public static GameManager instance;
+    //玩家參考物件
+    public static GameObject localPlayer;
     string gameVersion = "1";
     void Awake()
     {
@@ -27,6 +29,9 @@ public class GameManager : MonoBehaviourPunCallbacks
     {
         PhotonNetwork.ConnectUsingSettings();
         PhotonNetwork.GameVersion = gameVersion;
+
+        //檢查是否已載入遊戲
+        SceneManager.sceneLoaded += OnSceneLoaded;
     }
 
 
@@ -77,5 +82,17 @@ public class GameManager : MonoBehaviourPunCallbacks
     public override void OnJoinRoomFailed(short returnCode, string message)
     {
         Debug.LogWarningFormat("Join Room Failed {0}: {1}", returnCode, message);
+    }
+
+    //載入場景
+    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        if (!PhotonNetwork.InRoom)
+        {
+            return;
+        }
+        //生成玩家坦克
+        localPlayer = PhotonNetwork.Instantiate("TankPlayer", new Vector3(0, 0, 0), Quaternion.identity, 0);
+        Debug.Log("Player Instance ID: " + localPlayer.GetInstanceID());
     }
 }
