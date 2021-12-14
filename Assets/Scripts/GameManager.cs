@@ -17,6 +17,7 @@ public class GameManager : MonoBehaviourPunCallbacks
             DestroyImmediate(gameObject);
             return;
         }
+        //自動同步場景機制
         PhotonNetwork.AutomaticallySyncScene = true;
         DontDestroyOnLoad(gameObject);
         instance = this;
@@ -54,10 +55,22 @@ public class GameManager : MonoBehaviourPunCallbacks
         PhotonNetwork.JoinOrCreateRoom("Kingdom", options, null);
     }
 
-    //顯示加入成功
+    //當點下去按鈕後
     public override void OnJoinedRoom()
     {
-        Debug.Log("Joined room!!");
+        //如果是Master房主的話
+        if (PhotonNetwork.IsMasterClient)
+        {
+            //顯示創建房間
+            Debug.Log("Created room!!");
+            //載入場景
+            PhotonNetwork.LoadLevel("GameScene");
+        }
+        else
+        {
+            //顯示加入房間
+            Debug.Log("Joined room!!");
+        }
     }
 
     //顯示加入失敗
